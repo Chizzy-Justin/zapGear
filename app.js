@@ -9,6 +9,7 @@ const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const FacebookStrategy = require('passport-facebook').Strategy;
+require('dotenv').config();
 
 
 
@@ -22,10 +23,17 @@ app.use(bodyParser.json());
   app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
   app.use(express.static(__dirname + '/public'));
 // MongoDB connection
-mongoose.connect('mongodb://127.0.0.1:27017/zapGearECommerceDB', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-});
+// var connectionKey = 'mongodb://127.0.0.1:27017/zapGearECommerceDB'
+
+
+// const { MongoClient, ServerApiVersion } = require('mongodb');
+const dbHost = process.env.DB_HOST;
+
+
+ 
+
+
+mongoose.connect(dbHost);
 const db = mongoose.connection;
 
 mongoose.connection.once('open', () => {
