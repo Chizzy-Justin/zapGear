@@ -1,6 +1,6 @@
 <section class="intro grey">
     <div class="row">
-        <div class="col-6 p-2rem">
+        <div class="col-md-6 p-2rem">
          <h1>Apple Smart II</h1>
             <p>Find the best, reliable, and cheap smart watches here. A place where gadgets can't wait to reach their owner.</p>
             <a href="#"><button> shop now 
@@ -8,7 +8,7 @@
             </button></a>
         </div>
         
-        <div class="col-6 relative">
+        <div class="col-md-6 relative">
             <img src="images/apple-watch.png" class="main-img" alt="">
             <img src="images/party-ribbon.png" class="ribbon absolute" alt="">
         </div>
@@ -29,8 +29,8 @@
                     <img class="img-size" src="<%=product.productImage%>" alt="<%= product.productName %>" id="productpage<%=product._id%>" data-id="<%=product._id%>" onclick="passProductId('<%=product._id%>')"> 
                     <button class="add-to-cart" onclick='addToItemCart("<%=product._id%>")' id="product<%=product._id%>">Add To Cart</button>
                 </div>
-                <div class="card txt-img-section">
-                    <h5><%=product.productName%></h5>
+                <div class="card txt-img-section ">
+                    <h5 class="overflow-control"><%=product.productName%></h5>
                     <p>$ <span class="price"><%=product.productPrice%></span>     <span class="strikethrough">$150</span></p>
                 </div>
             </div>

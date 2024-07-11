@@ -11,12 +11,28 @@
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <input type="hidden" id="userData" value='<%= JSON.stringify(userData) %>'>
     <div class="container-fluid">
         <nav class="navbar">
             <div class="container-fluid">
               <span class="navbar-brand mb-0 h1">ZapGear</span>
               
-              <div class="right"><iconify-icon icon="mdi:user-outline"></iconify-icon></div>
+              
+                <div class="right row">
+                <div class="col-10">
+                  <% if (userData){%>
+                    <span id="username">Welome <%= userData.firstName %></span><br>
+                     <span id="useremail" style="display: none;"><%= userData._id %></span> 
+                    <% }%>
+                </div>
+                <div class="col-2">
+                  <a href="/login" style="font-size: 32px; color: #161616;"><iconify-icon icon="mdi:user-outline"></iconify-icon></a>
+       
+                </div>
+              </div>
+              
+             
+                          
             </div>           
           </nav>
           <nav class="navbar navbar-expand-lg">
@@ -44,7 +60,7 @@
              </div> -->
 
 <!-- Toggle button to open the modal -->
-<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#cartModal" onclick="viewCart()">
+<button type="button" class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#cartModal" onclick="viewCart()">
   Open Cart
 </button>
 
@@ -60,7 +76,7 @@
       <div class="modal-body">
         <div class="cart-section">
           <div class="row">
-            <div class="col-md-7">
+            <div class="col-lg-7">
               <div class="card cart-title pb-0">
                 <div class="row">
                   <div class="col-md-8">
@@ -96,46 +112,49 @@
                 </div>
               </div>
             </div>
-            <div class="col-md-5 checkout">
+            <div class="col-lg-5 checkout">
               <div class="card">
                 <h5>Summary</h5>
-                <form action="/createOrder" method="post">
+                <form <% if (userData){ %>action="/createOrder" method='post'<% } else {%>action="/login" method='get' <% }%>>  
+                 
+                 <input type="hidden" name="createOrder-email" value="<% if (userData){ %><%= userData._id%><% }%>">
                   <!-- Cart summary -->
                   <div id="checkout-products" class="checkout-products">
                     <!-- Cart summary items -->
                     <div class="row">
-                      <div class="col-8">
+                      <div class="col-6">
                         <p class="mb-0">IPS LCD Gaming Monitor</p>
                       </div>
-                      <div class="col-4">
-                        <h6 class="mb-0">&#x20A6 <span>375</span></h6>
+                      <div class="col-6">
+                        <h6 class="mb-0">&#x20A6 <span></span></h6>
                       </div>
                     </div>
                     <!-- Repeat the above cart summary item structure for each item -->
                   </div>
                   <hr>
                   <div class="row">
-                    <div class="col-8">
+                    <div class="col-6">
                       <p class="mb-0">SubTotal</p>
                     </div>
-                    <div class="col-4">
-                      <h6 class="mb-0">&#x20A6 <span id="subTotal">375</span></h6>
+                    <div class="col-6">
+                      <h6 class="mb-0">&#x20A6 <span id="subTotal">0</span></h6>
                     </div>
                   </div>
                   <div class="row">
-                    <div class="col-8">
-                      <p class="mb-0">VAT (7.5%)</p>
+                    <div class="col-6">
+                      <p class="mb-0">VAT (10%)</p>
                     </div>
-                    <div class="col-4">
-                      <h6 class="mb-0">&#x20A6 <span id="vatsPrice">7.6</span></h6>
+                    <div class="col-6">
+                      <h6 class="mb-0">&#x20A6 <span id="vatsPrice">0</span></h6>
                     </div>
                   </div>
+                  <hr>
                   <div class="row">
-                    <div class="col-8">
+                    <div class="col-6">
                       <h6 class="mb-0">TOTAL</h6>
                     </div>
-                    <div class="col-4">
-                      <h6 class="mb-0">&#x20A6 <span id="Total">375</span></h6>
+                    <div class="col-6">
+                      <h6 class="mb-0">&#x20A6 <span id="Total">0</span></h6>
                     </div>
                   </div>
                   <div class="">

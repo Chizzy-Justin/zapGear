@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vertical Toggleable Dynamic Pill</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
 </head>
 <body>
     <div class="container-fluid">
@@ -15,10 +16,16 @@
                         <a class="nav-link active" data-toggle="pill" href="#tab1">Add Product</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" data-toggle="pill" href="#tab2">Tab 2</a>
+                        <a class="nav-link" data-toggle="pill" href="#tab2">Orders</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" data-toggle="pill" href="#tab3">Tab 3</a>
+                        <a class="nav-link" data-toggle="pill" href="#tab3">Fulfilled</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-toggle="pill" href="#tab4">Product Inventory</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-toggle="pill" href="#tab5">Physical Orders</a>
                     </li>
                 </ul>
             </nav>
@@ -51,8 +58,9 @@
       </div>
 
       <div class="form-group">
-          <label for="productDescription">Product Description</label>
-          <textarea class="form-control" name="productDescription" id="productDescription" rows="4" placeholder="Enter product description"></textarea>
+        <label for="productDescription">Product Description</label>
+        <div id="quillEditor" style="height: 200px;"></div>
+        <input type="hidden" name="productDescription" id="productDescription">
       </div>
       <div class="form-group">
         <label for="category">Category</label>
@@ -76,6 +84,14 @@
                         <h2>Tab 3 Content</h2>
                         <p>This is the content for Tab 3.</p>
                     </div>
+                    <div class="tab-pane" id="tab4">
+                        <h2>Tab 2 Content</h2>
+                        <p>This is the content for Tab 4.</p>
+                    </div>
+                    <div class="tab-pane" id="tab5">
+                        <h2>Tab 2 Content</h2>
+                        <p>This is the content for orders in the physical store.</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -83,5 +99,25 @@
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.min.js"></script>
+    <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+    <script>
+        var quill = new Quill('#quillEditor', {
+            theme: 'snow',
+            modules: {
+                toolbar: [
+                    ['bold', 'italic'],
+                    [{'list': 'ordered'}, {'list': 'bullet'}],
+                    [{'align': []}],
+                    ['clean']
+                ]
+            }
+        });
+
+        var form = document.getElementById('productForm');
+        form.onsubmit = function() {
+            var description = document.querySelector('input[name=productDescription]');
+            description.value = quill.root.innerHTML;
+        };
+    </script>
 </body>
 </html>

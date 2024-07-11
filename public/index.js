@@ -10,6 +10,43 @@ var cartList = [];
 var cartListBtnIdList = [];
 var itemQty = [];
 
+const urlParams = new URLSearchParams(window.location.search);
+const message = urlParams.get('message');
+const success = urlParams.get('success');
+
+if (message) {
+  console.log("not done");
+  const alertElement = document.createElement('div');
+  alertElement.textContent = message;
+  alertElement.classList.add('alert-message');
+  console.log("almost done");
+  const body = document.getElementById("main-container");
+  body.insertBefore(alertElement, body.firstChild);
+  console.log("done");
+  setTimeout(() => {
+      alertElement.remove();
+  }, 3000);
+};
+if (success) {
+  const alertElement = document.createElement('div');
+  alertElement.textContent = success;
+  alertElement.classList.add('alert-success');
+
+  const body = document.body;
+
+  body.insertBefore(alertElement, body.firstChild);
+  setTimeout(() => {
+      alertElement.remove();
+  }, 3000);
+}
+
+
+
+  
+
+
+
+
 
 window.onload = function() {
   // Retrieve data from localStorage
@@ -32,6 +69,8 @@ window.onload = function() {
           element.innerHTML = "Already Added!";
         }
       });
+
+    
       // Use the retrieved data
       console.log("Stored cartList:", cartList);
       console.log("Stored cartListBtnIdList:", cartListBtnIdList);
@@ -40,7 +79,44 @@ window.onload = function() {
       console.log("No stored data found or some data is missing.");
   }
 };
+function sendCart(){
 
+ var storedCartList = localStorage.getItem("cartList");
+ var storedCartListBtnIdList = localStorage.getItem("cartListBtnIdList");
+ var storedItemQty = localStorage.getItem("itemQty");
+
+ if (storedCartList !== null && storedCartListBtnIdList !== null && storedItemQty !== null) {
+    
+     cartList = JSON.parse(storedCartList);
+     cartListBtnIdList = JSON.parse(storedCartListBtnIdList);
+     itemQty = JSON.parse(storedItemQty);
+     
+
+     cartListBtnIdList.forEach(id => {
+       var element = document.getElementById("product"+id);
+       if (element) {
+         element.disabled = true;
+         element.innerHTML = "Already Added!";
+       }
+     });
+
+     document.getElementById('cartListInput').value = JSON.stringify(cartList);
+     document.getElementById('cartListBtnIdListInput').value = JSON.stringify(cartListBtnIdList);
+     document.getElementById('itemQtyInput').value = JSON.stringify(itemQty);
+ 
+     // Submit the form
+     document.getElementById('signupForm').submit();
+    
+    
+     // Use the retrieved data
+     console.log("Stored cartList:", cartList);
+     console.log("Stored cartListBtnIdList:", cartListBtnIdList);
+     console.log("Stored itemQty:", itemQty);
+ } else {
+     console.log("No stored data found or some data is missing.");
+ }
+}
+//document.getElementById("signup").onclick = sendCart()
 window.addEventListener("pageshow", function(event) {
   // Check if the page is loaded from the cache
   if (event.persisted) {
@@ -71,6 +147,44 @@ window.addEventListener("pageshow", function(event) {
   }
 });
 
+function saveUserDataToServer() {
+  // Get data from localStorage
+  console.log("triggr");
+  if (document.getElementById("useremail")) {
+    const useremail=document.getElementById("useremail").innerHTML;
+    console.log("triggr", useremail);
+  
+
+  if (useremail !== '' && useremail !== null) {
+     // Make a POST request to the backend
+     fetch('/save-user-data', {
+      method: 'POST',
+      headers: {
+          'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+          useremail: useremail,
+          cartList: cartList,
+          cartListBtnIdList: cartListBtnIdList,
+          itemQty: itemQty
+      })
+  })
+  .then(response => {
+      if (!response.ok) {
+          throw new Error('Network response was not ok.');
+      }
+      return response.json();
+  })
+  .then(data => {
+      console.log('Data saved successfully:', data);
+      // Handle success response from the server
+  })
+  .catch(error => {
+      console.error('Error saving data:', error);
+      // Handle error
+  });
+  }
+}}
 
 
 class Cart {
@@ -96,36 +210,10 @@ function addToCart(price, qty, name, img, id, description){
   localStorage.setItem("cartList", JSON.stringify(cartList));
   localStorage.setItem("cartListBtnIdList", JSON.stringify(cartListBtnIdList));
   localStorage.setItem("itemQty", JSON.stringify(itemQty));
+
+  saveUserDataToServer();
 }
-// function addToItemCart(productId) {
-//   return new Promise((resolve, reject) => {
-//       // Make an AJAX request to the server
-//       var xhr = new XMLHttpRequest();
-//       xhr.open("GET", "/addProductToCart?productId=" + productId, true);
-//       xhr.onreadystatechange = function () {
-//           if (xhr.readyState === 4) {
-//               if (xhr.status === 200) {
-//                   // Parse response JSON
-//                   var product = JSON.parse(xhr.responseText);
-//                   // Resolve the promise with the product
-//                   resolve(product);
-//               } else {
-//                   // Reject the promise with the error message
-//                   reject("Error adding product to cart: " + xhr.statusText);
-//               }
-//           }
-//       };
-//       xhr.send();
-//   })
-//   .then((product) => {
-//       // Call addToCart function with product parameters
-//       addToCart(product.productPrice, 1, product.productName, product.productImage, product._id, product.productDescription);
-//   })
-//   .catch((error) => {
-//       console.error(error);
-//       // Handle error here if needed
-//   });
-// }
+
 
 function addToItemCart(productId) {
   // Make an AJAX request to the server
@@ -167,27 +255,18 @@ function viewCart(){
       '</div>' +
       '<div class="col-8">' +
           '<h6>'+cartList[i].name+'</h6>' +
-          '<h5>&#x20A6 <span>'+cartList[i].price *itemQty[i] +'</span></h5>'+
+          '<h6>&#x20A6 <span>'+cartList[i].price *itemQty[i] +'</span></h6>'+
           '<a class="colored-border" onclick="reduce('+i+')">-</a>'+
           '<span id="item-count'+i+'" class="item-qty">'+itemQty[i]+'</span>'+
           '<a class="colored-border" onclick="increase('+i+')">+</a>'+
           '<iconify-icon icon="la:trash-alt-solid" id="remove" onclick="deleteCartItem('+i+')"></iconify-icon> </div>    <hr class="mt-2"> </div></div>';
-//  text = '<div class="row border-top border-bottom">'+
-//    '<div class="row main align-items-center">'+
-//         '<div class="col-2"><img class="img-fluid" src="/uploads/'+cartList[i].img+'" id="itemPicture"></div><div class="col"><div class="row text-muted">'+cartList[i].category+'</div><div class="row">'+cartList[i].name+'</div></div>'+
-//         '<div class="col">' +
-//         '<a href="#" onclick="reduce('+i+')">-</a>' +
-//         '<a href="#" id="item-count'+i+'" class="border">'+itemQty[i]+'</a>' +
-//         '<a href="#" onclick="increase('+i+')">+</a> </div>' +
-//         '<div class="col">$'+cartList[i].price *itemQty[i] +' <span class="close" id="remove" onclick="deleteCartItem('+i+')">&#10005;</span></div>'+
-//     '</div>'
-//  '</div>';
+
 
 checkoutProducts =    '<div class="row">'+
-'<div class="col-8">'+
+'<div class="col-6">'+
     '<p>'+cartList[i].name+'</p>'+
 '</div>'+
-'<div class="col-4">' +
+'<div class="col-6">' +
     '<h6>&#x20A6 <span>'+cartList[i].price *itemQty[i]+'</span></h6>'+
 '</div></div>';
 document.getElementById("checkout-products").innerHTML += checkoutProducts;
@@ -204,6 +283,7 @@ function reduce(i){
     } else {
       itemQty[i] = itemQty[i]-1;
       localStorage.setItem("itemQty", JSON.stringify(itemQty));
+      saveUserDataToServer()
      viewCart();
     }
   }
@@ -215,7 +295,7 @@ function reduce(i){
     itemQty[i] = itemQty[i]+1;
     localStorage.setItem("itemQty", JSON.stringify(itemQty));
     console.log("increase " +itemCount);
-    
+    saveUserDataToServer()
     viewCart();
   }
   function updatePrices(){
@@ -226,7 +306,7 @@ function reduce(i){
           
             subTotals += Number(cartList[i].price) * itemQty[i];
             document.getElementById("subTotal").innerHTML = subTotals.toFixed(2) ;
-            var vats  =107.5/100;
+            var vats  =110/100;
             var Total =  subTotals * vats;
             document.getElementById("Total").innerHTML = Total.toFixed(2);
             var vatPrice = Total - subTotals;
@@ -253,6 +333,7 @@ function reduce(i){
           localStorage.setItem("cartList", JSON.stringify(cartList));
           localStorage.setItem("cartListBtnIdList", JSON.stringify(cartListBtnIdList));
           localStorage.setItem("itemQty", JSON.stringify(itemQty));
+          saveUserDataToServer()
   }
   var btnId;
 function deleteCartItem(index){
@@ -266,6 +347,7 @@ function deleteCartItem(index){
         localStorage.setItem("cartList", JSON.stringify(cartList));
         localStorage.setItem("cartListBtnIdList", JSON.stringify(cartListBtnIdList));
         localStorage.setItem("itemQty", JSON.stringify(itemQty));
+        saveUserDataToServer();
         viewCart();
         if (cartList.length == 0) {
             onClearCartClicked();
@@ -297,3 +379,34 @@ function passProductId(productId) {
 
 };
 
+
+
+const userDataElement = document.getElementById('userData');
+const userDataString = userDataElement.value; 
+const userData = JSON.parse(userDataString);
+
+if (userDataString !== '') {
+  localStorage.setItem('cartList', JSON.stringify(userData.cartList));
+localStorage.setItem('cartListBtnIdList', JSON.stringify(userData.cartListBtnIdList));
+localStorage.setItem('itemQty', JSON.stringify(userData.itemQty));
+}
+
+
+document.getElementById("signupForm").addEventListener("submit", function(event) {
+  if (!this.checkValidity()) {
+      event.preventDefault();
+      event.stopPropagation();
+  }
+  this.classList.add("was-validated");
+});
+
+// Password Show/Hide functionality
+document.querySelector('.passShowHide').addEventListener('click', function() {
+  const passwordInput = document.getElementById('signupPassword');
+  if (passwordInput.type === 'password') {
+      passwordInput.type = 'text';
+  } else {
+      passwordInput.type = 'password';
+  }
+  this.textContent = passwordInput.type === 'password' ? 'Show' : 'Hide';
+});
